@@ -5,6 +5,7 @@ import collections
 import numpy as np
 import tensorflow as tf
 import time
+import errno
 
 from inspect import getsourcefile
 current_path = os.path.dirname(os.path.abspath(getsourcefile(lambda:0)))
@@ -47,8 +48,11 @@ class PolicyMonitor(object):
 
     try:
       os.makedirs(self.video_dir)
-    except FileExistsError:
-      pass
+    except OSError as e:
+      if e.errno == errno.EEXIST:
+          print('Directory not created.')
+      else:
+          raise
 
     # Local policy net
     with tf.variable_scope("policy_eval"):
