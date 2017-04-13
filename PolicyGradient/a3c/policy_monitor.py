@@ -38,8 +38,8 @@ class PolicyMonitor(object):
     self.video_dir = os.path.join(summary_writer.get_logdir(), "../videos")
     self.video_dir = os.path.abspath(self.video_dir)
 
-    # self.env = Monitor(env, directory=self.video_dir, video_callable=lambda x: True, resume=True)
-    self.env = env
+    self.env = Monitor(env, directory=self.video_dir, video_callable=lambda x: True, resume=True)
+    # self.env = env
     self.global_policy_net = policy_net
     self.summary_writer = summary_writer
     self.saver = saver

@@ -2,8 +2,12 @@ from PIL import Image
 import json
 import os
 import numpy as np
+import gym
+from gym import utils
+import pdb
 
-class Environment:
+class Environment(gym.Env, utils.EzPickle):
+	metadata = {'render.modes': ['human', 'rgb_array']}
 	def __init__(self, target_object = 'nature_valley_sweet_and_salty_nut_almond', \
 								root = '../../../ActiveVisionDataset/', \
 								scene_name = 'Home_001_1', \
@@ -14,6 +18,7 @@ class Environment:
 		self.env_first_image = env_first_image
 		self.action_map = {0:"rotate_ccw", 1:"rotate_cw", 2:"forward", 3:"backward", 4:"left", 5:"right"}
 		self.nA = len(self.action_map)
+		self.viewer = None
 
 		## load annotations
 		with open(os.path.join(root,scene_name,'annotations.json')) as json_data:
@@ -64,16 +69,40 @@ class Environment:
 				break
 		if next_image != "":
 		    self.current_image = next_image	
-		return self.process_state_for_network(self.images[self.current_image]),reward,done,"" ## no info
+		return self.process_state_for_network(self.images[self.current_image]),reward,done,{} ## no info
 
-if __name__ == '__main__':
-	env = Environment()
-	first_image = env.reset()
-	# result = Image.fromarray((first_image * 255).astype(np.uint8))
-	# result.save(env.current_image)
-	done = False
-	while(not done):
-		new_image,reward,done,info = env.step("0")
-		print(reward,done,info)
-		result = Image.fromarray((new_image * 255).astype(np.uint8))
-		result.save(env.current_image)
+	def to_rgb1(self, im):
+	    im = im.reshape(90, 160)
+	    w, h = im.shape
+	    ret = np.empty((w, h, 3), dtype=np.uint8)
+	    ret[:, :, 0] = im
+	    ret[:, :, 1] = im
+	    ret[:, :, 2] = im
+	    return ret
+
+	def _render(self, mode='human', close=False):
+		if close:
+		    if self.viewer is not None:
+		        self.viewer.close()
+		        self.viewer = None
+		    return
+		pdb.set_trace() 
+		if mode == 'rgb_array':
+		    return self.to_rgb1(self.images[self.current_image])
+		elif mode == 'human':
+		    from gym.envs.classic_control import rendering
+		    if self.viewer is None:
+		        self.viewer = rendering.SimpleImageViewer()
+		    self.viewer.imshow(self.to_rgb1(self.images[self.current_image]))		
+
+# if __name__ == '__main__':
+# 	env = Environment()
+# 	first_image = env.reset()
+# 	# result = Image.fromarray((first_image * 255).astype(np.uint8))
+# 	# result.save(env.current_image)
+# 	done = False
+# 	while(not done):
+# 		new_image,reward,done,info = env.step(0)
+# 		print(reward,done,info)
+# 		result = Image.fromarray((new_image * 255).astype(np.uint8))
+# 		result.save(env.current_image)
