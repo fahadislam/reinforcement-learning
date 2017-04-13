@@ -18,10 +18,13 @@ from lib.atari import helpers as atari_helpers
 from estimators import ValueEstimator, PolicyEstimator
 
 
-def make_env():
-  return gym.envs.make("Breakout-v0")
+env = Environment()
+def make_env(wrap=True):
+  # return gym.envs.make("Breakout-v0")
+  return env
 
-VALID_ACTIONS = [0, 1, 2, 3]
+# VALID_ACTIONS = [0, 1, 2, 3]
+VALID_ACTIONS = [0, 1, 2, 3, 4, 5]
 
 class PolicyEstimatorTest(tf.test.TestCase):
   def testPredict(self):

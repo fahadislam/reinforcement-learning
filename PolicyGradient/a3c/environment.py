@@ -12,6 +12,8 @@ class Environment:
 								instances_id_path = '../../../ActiveVisionDataset/'):
 		self.scene_name = scene_name
 		self.env_first_image = env_first_image
+		self.action_map = {0:"rotate_ccw", 1:"rotate_cw", 2:"forward", 3:"backward", 4:"left", 5:"right"}
+		self.nA = len(self.action_map)
 
 		## load annotations
 		with open(os.path.join(root,scene_name,'annotations.json')) as json_data:
@@ -39,7 +41,8 @@ class Environment:
 		im.load()
 		im = Image.fromarray(np.uint8(im))
 		im_gray = im.convert('L')
-		return np.uint8(np.asarray(im_gray))
+		im_resized = im_gray.resize((160, 90), Image.ANTIALIAS)		#same aspect ratio
+		return np.uint8(np.asarray(im_resized)).reshape(90, 160, 1)		#to fix
 
 	def process_state_for_network(self,im):
 		return np.float32(im)/255.0
@@ -51,15 +54,16 @@ class Environment:
 	def step(self,action):
 		done = False
 		reward = 0
-		next_image = self.data[self.current_image][action]
-		if next_image == "":
-			done = True
+		next_image = self.data[self.current_image][self.action_map[action]]
+		# if next_image == "":
+		# 	done = True
 		for bbox in self.data[self.current_image]["bounding_boxes"]:
 			if bbox[4] == self.target_object_id:
 				reward = 1
 				done = True
 				break
-		self.current_image = next_image
+		if next_image != "":
+		    self.current_image = next_image	
 		return self.process_state_for_network(self.images[self.current_image]),reward,done,"" ## no info
 
 if __name__ == '__main__':
@@ -69,7 +73,7 @@ if __name__ == '__main__':
 	# result.save(env.current_image)
 	done = False
 	while(not done):
-		new_image,reward,done,info = env.step("rotate_ccw")
+		new_image,reward,done,info = env.step("0")
 		print(reward,done,info)
-		# result = Image.fromarray((new_image * 255).astype(np.uint8))
-		# result.save(env.current_image)
+		result = Image.fromarray((new_image * 255).astype(np.uint8))
+		result.save(env.current_image)

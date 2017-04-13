@@ -11,6 +11,8 @@ import shutil
 import threading
 import multiprocessing
 
+from environment import Environment
+
 from inspect import getsourcefile
 current_path = os.path.dirname(os.path.abspath(getsourcefile(lambda:0)))
 import_path = os.path.abspath(os.path.join(current_path, "../.."))
@@ -34,22 +36,30 @@ tf.flags.DEFINE_integer("parallelism", None, "Number of threads to run. If not s
 
 FLAGS = tf.flags.FLAGS
 
+env = Environment()
 def make_env(wrap=True):
-  env = gym.envs.make(FLAGS.env)
-  # remove the timelimitwrapper
-  env = env.env
-  if wrap:
-    env = atari_helpers.AtariEnvWrapper(env)
   return env
+  # env = gym.envs.make(FLAGS.env);
+  
+  # remove the timelimitwrapper
+  # env = env.env
+  # if wrap:
+  #   env = atari_helpers.AtariEnvWrapper(env)
 
 # Depending on the game we may have a limited action space
 env_ = make_env()
-if FLAGS.env == "Pong-v0" or FLAGS.env == "Breakout-v0":
-  VALID_ACTIONS = list(range(4))
-else:
-  VALID_ACTIONS = list(range(env_.action_space.n))
-env_.close()
-
+# if FLAGS.env == "Pong-v0" or FLAGS.env == "Breakout-v0":
+#   VALID_ACTIONS = list(range(4))
+# else:
+#   VALID_ACTIONS = list(range(env_.action_space.n))
+# env_.close()
+VALID_ACTIONS = list(range(env_.nA))
+    # "rotate_ccw":"
+    # "rotate_cw":"
+    # "forward":"
+    # "backward":
+    # "left":"
+    # "right":
 
 # Set the number of workers
 NUM_WORKERS = multiprocessing.cpu_count()

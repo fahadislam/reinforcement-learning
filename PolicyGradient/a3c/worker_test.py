@@ -7,6 +7,8 @@ import unittest
 import numpy as np
 import tensorflow as tf
 
+from environment import Environment
+
 from inspect import getsourcefile
 current_path = os.path.dirname(os.path.abspath(getsourcefile(lambda:0)))
 import_path = os.path.abspath(os.path.join(current_path, "../.."))
@@ -20,10 +22,13 @@ from lib.atari import helpers as atari_helpers
 from worker import Worker
 from estimators import ValueEstimator, PolicyEstimator
 
-def make_env():
-  return gym.envs.make("Breakout-v0")
+env = Environment()
+def make_env(wrap=True):
+  # return gym.envs.make("Breakout-v0")
+  return env
 
-VALID_ACTIONS = [0, 1, 2, 3]
+# VALID_ACTIONS = [0, 1, 2, 3]
+VALID_ACTIONS = [0, 1, 2, 3, 4, 5]
 
 class WorkerTest(tf.test.TestCase):
   def setUp(self):
