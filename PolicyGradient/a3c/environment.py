@@ -12,7 +12,8 @@ class Environment(gym.Env, utils.EzPickle):
 								root = '../../../ActiveVisionDataset/', \
 								scene_name = 'Home_001_1', \
 								images_dir = 'jpg_rgb', \
-								env_first_image = '000110000010101.jpg', \
+								# env_first_image = '000110000010101.jpg', \
+								env_first_image = '000110000090101.jpg', \
 								instances_id_path = '../../../ActiveVisionDataset/'):
 		self.scene_name = scene_name
 		self.env_first_image = env_first_image
@@ -58,7 +59,7 @@ class Environment(gym.Env, utils.EzPickle):
 
 	def step(self,action):
 		done = False
-		reward = 0
+		reward = -1
 		next_image = self.data[self.current_image][self.action_map[action]]
 		# if next_image == "":
 		# 	done = True
@@ -86,7 +87,6 @@ class Environment(gym.Env, utils.EzPickle):
 		        self.viewer.close()
 		        self.viewer = None
 		    return
-		pdb.set_trace() 
 		if mode == 'rgb_array':
 		    return self.to_rgb1(self.images[self.current_image])
 		elif mode == 'human':
